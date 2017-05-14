@@ -1,0 +1,12 @@
+<xml>
+    <!-- Источники данных уровня ядра. Это может быть любая модель данных, котора находится в ядре -->
+    <User data_type="reference" table_name='auth_user'/>
+
+    <!-- Модели проектов BPM -->
+    <Correspondence data_type="reference" table_name='bps_correspondence'/>
+
+    <!-- Корреспонденция -->
+    <CorrespondenceDirection data_type="xml" title="Направление корреспонденции"/>
+
+
+</xml>

@@ -1,0 +1,46 @@
+﻿<xml>
+    <title>Корреспонденция</title>
+    <description>Проект для учета входящей и исходящей корреспонденции</description>
+    <rows_on_page>30</rows_on_page>
+
+    <roles>admin</roles>
+    <roles_creator>admin</roles_creator>
+
+    <templates>
+        <document_form>correspondence/document_form.html</document_form>
+    </templates>
+
+    <!-- Папки и под-папки, в которые можно загружать файлы -->
+    <files>
+
+    </files>
+
+    <!-- Параметры карточки, которые показываются в таблице со списком карточек -->
+    <document_fields_table>direction, num</document_fields_table>
+
+    <!--
+    Параметры карточки документа.
+    Эти параметры могут быть непосредственно не выводиться в форме карточки при открытии в браузере.
+    Описываются все аттрибуты, которые есть у документа "Корреспондения"
+    -->
+    <document_fields>
+        <main title="Корреспонденция">
+            <direction title="Направление" data_type="choices" source="CorrespondenceDirection"/>
+            <num title="Номер" data_type="string"/>
+        </main>
+    </document_fields>
+
+    <filter_fields></filter_fields>
+
+    <!-- Заранее настроенные шаблоны поиска, чтобы между ними можно было переключаться, не набирая все эти опции в фильтре -->
+    <fiter_presets>
+        <work>В работе</work>
+        <archive>Архивные</archive>
+    </fiter_presets>
+
+    <!-- Этапы, на которых может быть карточка корреспонденции -->
+    <states>
+        <draft title=""/>
+        <archive title="Архив"/>
+    </states>
+</xml>

@@ -1,0 +1,37 @@
+<xml>
+    <field_access>
+        <edit>
+            legal_status,
+            contracts
+        </edit>
+    </field_access>
+
+    <field_access>
+        <validator>
+            <legal_status rule="equal">company</legal_status>
+        </validator>
+        <edit>
+            company_name,
+            lpr_table,
+            executor_table
+        </edit>
+    </field_access>
+
+    <field_access>
+        <validator>
+            <legal_status rule="equal">individual</legal_status>
+        </validator>
+        <edit>
+            surname, name, patronymic,
+            phones, email,
+            pass_series, n_passport, d_passport, issued_by
+        </edit>
+    </field_access>
+
+     <events>
+        <correct title="Корректировка">
+            <correct_1 direction="user" state="draft" title="Черновик" tags="uncondition_state"/>
+            <correct_2 direction="user" state="archive" title="Архив" tags="uncondition_state"/>
+        </correct>
+    </events>
+</xml>

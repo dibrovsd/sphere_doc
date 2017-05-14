@@ -1,0 +1,38 @@
+{% extends 'lib/base.html' %}
+
+
+{% block breadcrumbs %}{% endblock %}
+
+
+{% block content %}
+    <h1>Здравствуйте</h1>
+    <hr>
+
+    <p>
+        Здравствуйте,<br/>
+        Представляем вам комплекс автоматизации процессов.<br/><br/>
+
+        В него входят различные системы, но задача у них одна:<br/>
+        Упростить вашу жизнь и переложить часть работы на систему.<br/><br/>
+
+        С уважением, команда разработчиков<br/>
+        <a href="mailto:dibrovsd@gmail.com">dibrovsd@gmail.com</a>
+    </p>
+
+    <p>
+        {% if g.user.is_active %}
+            <a class="btn btn-default" href="{{ url_for('bps.index') }}">
+                <span class="glyphicon glyphicon-th-list"></span> Документы</a>
+
+                <a class="btn btn-default" href="{{ url_for('admin.index') }}">
+                    <span class="glyphicon glyphicon-cog"></span> Админка</a>
+        {% else %}
+            <div class="alert alert-info alert-sm">
+                Чтобы получить доступ к возможностям системы
+                <a class="btn btn-success btn-xs" href="{{ url_for('auth.login') }}">представьтесь</a>
+                пожалуйста
+            </div>
+        {% endif %}
+    </p>
+
+{% endblock %}

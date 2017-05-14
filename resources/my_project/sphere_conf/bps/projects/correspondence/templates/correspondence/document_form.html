@@ -1,0 +1,13 @@
+{% extends 'bps/document_form.html' %}
+
+
+{% block js %}
+    {{super()}}
+    <script type="text/javascript" src="{{ url('correspondence.static', filename='script.js') }}?v={{config.STATIC_VERSION}}"></script>
+{% endblock %}
+
+
+{% block css %}
+    {{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url('correspondence.static', filename='style.css') }}?v={{config.STATIC_VERSION}}"/>
+{% endblock css %}
