@@ -38,6 +38,8 @@
 
     virtualenv ~/.virtualenv/sphere --python=python3
     source ~/.virtualenv/sphere/bin/activate
+    pip install -U pip
+    pip install -U setuptools
     pip install -r ~/requirements.txt
 
 Инициализация базы данных
@@ -53,12 +55,12 @@
     CREATE USER sphere_user PASSWORD '******';
 
 
-    create database sphere;
+    create database my_project;
 
-    alter database sphere owner to sphere;
-    alter database sphere set timezone = 'UTC';
-    alter database sphere set default_transaction_isolation = 'read committed';
-    alter database sphere set client_encoding = 'UTF8';
+    alter database my_project owner to my_project;
+    alter database my_project set timezone = 'UTC';
+    alter database my_project set default_transaction_isolation = 'read committed';
+    alter database my_project set client_encoding = 'UTF8';
 
     \q
 
@@ -66,7 +68,7 @@
 Создание базового приложения
 -------------------------------
 
-Скачайте минимальный :download:`шаблон</files/SPHERE.tar>` системы со всеми настройками и разархивируйте
+Скачайте минимальный :download:`шаблон</files/my_project.tar>` системы со всеми настройками и разархивируйте
 в директорию my_project.
 
 .. note::
@@ -79,10 +81,10 @@
 Редактирование конфигурации.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Откроем файл /home/www/my_project/conf._local.py
-и опишем в нем соединение с базой данных
+Откроем файл ``nano /home/www/my_project/conf_local.py``
+и в переменной SQLALCHEMY_DATABASE_URI запишем пароль к базе данных, который мы задали, создавая пользователя базы данных sphere_user
 
-``SQLALCHEMY_DATABASE_URI = 'postgresql://sphere_user:****@localhost/sphere'``
+``SQLALCHEMY_DATABASE_URI = 'postgresql://sphere_user:****@localhost/my_project'``
 Мы рекомендуем опции, которые содержат пароли не хранить в репозитории (файл config.py находится в репозитории),
 а размещать в секции, которая находится вне его. В случае, если кто-то получит не санкционированный доступ к репозиторию с системой,
 он не сможет выполнить подключиться к данным.
@@ -108,10 +110,11 @@
 Выполним команду ``./manage.py db upgrade``.
 После этого, в базе данных будет создана необходимая стркутура.
 
-**Создадим учетную запись супер-пользователя**
+Создадим учетную запись супер-пользователя
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Это пользователь, который сможет войти в систему через браузер, имеет по умолчанию полный доступ ко всем разделам системы.
-``./manage.py create_superuser(<e-mail>, <пароль>)``
+``./manage.py create_superuser <e-mail> <пароль>``
 
 Запустим систему
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -165,15 +168,29 @@
 .. code-block:: bash
 
     ln -s /etc/uwsgi/apps-available/my_project.ini /etc/uwsgi/apps-enabled/my_project.ini
-    servise uwsgi restart
-    servise uwsgi status
-
-
-.. code-block:: bash
-
-    Сюда нужно сделать вывод
+    service uwsgi restart
+    service uwsgi status
 
 Если видим там работающее приложение, значит все идет правильно.
+
+.. code-block:: none
+
+    root@virtualbox-sphere:~# service uwsgi status
+    ● uwsgi.service - LSB: Start/stop uWSGI server instance(s)
+       Loaded: loaded (/etc/init.d/uwsgi)
+       Active: active (running) since Wed 2017-04-26 21:39:17 MSK; 18s ago
+      Process: 22720 ExecStop=/etc/init.d/uwsgi stop (code=exited, status=0/SUCCESS)
+      Process: 22759 ExecStart=/etc/init.d/uwsgi start (code=exited, status=0/SUCCESS)
+       CGroup: /system.slice/uwsgi.service
+               ├─22870 /usr/bin/uwsgi --ini /usr/share/uwsgi/conf/default.ini --ini /etc/uwsgi/apps-enabled/my_project.ini --daemonize /var/log/uwsgi/app/my_project.log
+               ├─22895 /usr/bin/uwsgi --ini /usr/share/uwsgi/conf/default.ini --ini /etc/uwsgi/apps-enabled/my_project.ini --daemonize /var/log/uwsgi/app/my_project.log
+               ├─22896 /usr/bin/uwsgi --ini /usr/share/uwsgi/conf/default.ini --ini /etc/uwsgi/apps-enabled/my_project.ini --daemonize /var/log/uwsgi/app/my_project.log
+               └─22897 /usr/bin/uwsgi --ini /usr/share/uwsgi/conf/default.ini --ini /etc/uwsgi/apps-enabled/my_project.ini --daemonize /var/log/uwsgi/app/my_project.log
+
+    Apr 26 21:39:17 virtualbox-sphere systemd[1]: Starting LSB: Start/stop uWSGI server instance(s)...
+    Apr 26 21:39:17 virtualbox-sphere uwsgi[22759]: Starting app server(s): uwsgi -> . done.
+    Apr 26 21:39:17 virtualbox-sphere systemd[1]: Started LSB: Start/stop uWSGI server instance(s).
+    root@virtualbox-sphere:~#
 
 Конфигурирование nginx
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -187,7 +204,7 @@ nginx - это простой web-сервер, который будет неп
 Если на сервере живут несколько приложений на 80-м или 443-м порту (http / https), то nginx по имени домена, на который пришел запрос, может разобраться и
 перенаправить запрос в нужное приложение.
 
-Для этого, создадим файл конфигурации ``nano /etc/nginx/site-available/my_project``
+Для этого, создадим файл конфигурации ``nano /etc/nginx/sites-available/my_project``
 Приведем самый простой случай, когда на сервере развернута только эта система и она развернута по http.
 В этом случае, все входящие запросы на 80-й порт (порт по умолчанию для http) мы обрабатываем нашим приложением.
 Запросы, которые пришли на /lib/media/, это запросы на получение файлов, загруженных пользователями.
@@ -226,8 +243,9 @@ nginx - это простой web-сервер, который будет неп
 
 .. code-block:: bash
 
-    ln -s /etc/nginx/site-available/my_project /etc/nginx/site-enabled/my_project
-    servise nginx restart
+    ln -s /etc/nginx/sites-available/my_project /etc/nginx/sites-enabled/my_project
+    rm /etc/nginx/sites-available/default
+    service nginx restart
 
 Проверим в браузере работу нашего приложения http://IP_СЕРВЕРА/
 
@@ -242,12 +260,24 @@ nginx - это простой web-сервер, который будет неп
 Для всего этого, мы используем проект celery, который тесно интегрирован в систему и его остается просто запустить, чтоб он начал работать.
 Запускаем все это через supervisor
 
+Настроим транспорт, через который будут передаваться задания между процессом, который выполняет работу и системой, которая будет ставить ему задачи
+
+.. code-block:: bash
+
+    rabbitmqctl add_user sphere_user *********
+    rabbitmqctl add_vhost localhost_my_project
+    rabbitmqctl set_permissions -p localhost_my_project sphere_user ".*" ".*" ".*"
+
+И пароль, который мы ввели при создании пользователя пропишем в настройку транспорта брокера фоновых процессов
+``nano /home/www/my_project/conf_local.py``
+````
+
 Cоздадим файл конфигурации ``nano /etc/supervisor/conf.d/my_project.conf``
 
 .. code-block:: ini
 
     [program:my_project]
-    directory=/home/www/projects/my_project
+    directory=/home/www/my_project
     command=/home/www/.virtualenv/sphere/bin/celery -A sphere worker --beat -E --loglevel=warning -n celery_my_project
     user=www
     numprocs=1
@@ -262,6 +292,28 @@ Cоздадим файл конфигурации ``nano /etc/supervisor/conf.d/
 .. code-block:: bash
 
     supervisorctl reload
+
+.. code-block:: none
+
     supervisorctl status
 
-На этом все. У нас есть приложение, которое работает. В нем есть учетная запись супер-пользователя и запущен менеджер фоновых операций
+    root@virtualbox-sphere:~# supervisorctl status
+    my_project                       **RUNNING**    pid 23518, uptime 0:00:12
+    root@virtualbox-sphere:~#
+
+    # Из под учетной записи www из директории /home/www/my_project
+    celery status -b 'amqp://sphere_user:*********@localhost:5672/localhost_my_project'
+
+    (sphere)www@virtualbox-sphere:~/my_project$
+    (sphere)www@virtualbox-sphere:~/my_project$ celery status -b 'amqp://sphere_user:*********@localhost:5672/localhost_my_project'
+    celery@celery_my_project: OK
+
+    **1 node online.**
+    (sphere)www@virtualbox-sphere:~/my_project$
+
+На этом все. У нас есть приложение, которое работает. В нем есть учетная запись супер-пользователя и запущен менеджер фоновых операций.
+Чтобы убедиться, что все работает и запускается при загрузки сервера, перезапустим его и после запуска, проверим работающее приложение в браузере
+
+.. code-block:: bash
+
+    reboot
