@@ -10,6 +10,7 @@
 Пример файла schema.py:
 
 .. code-block:: python
+
     # импортируем необходимый инструментарий
     from werkzeug.utils import cached_property
     from datetime import date

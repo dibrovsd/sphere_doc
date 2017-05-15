@@ -1,5 +1,5 @@
 Архитектура
-========
+=============
 
 Раздел описывает архитектуру
 
@@ -12,6 +12,7 @@
    email/index
    lib/index
    logs/index
+   pdf_maker/index
    reports/index
    sms/index
    config

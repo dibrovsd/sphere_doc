@@ -15,7 +15,6 @@
    managment_commands
    mixin_models
    models
-   paginator
    tasks
    template_extensions
    transform

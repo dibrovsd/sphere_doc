@@ -11,7 +11,6 @@
 
    admin
    blueprint
-   decorators
    forms
    models
    utils

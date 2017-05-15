@@ -18,8 +18,8 @@
    customizing/index
 
 
-Indices and tables
-==================
+Структура документации
+=======================
 
 * :ref:`genindex`
 * :ref:`modindex`
