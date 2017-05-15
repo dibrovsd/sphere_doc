@@ -18,6 +18,27 @@
     <!-- Параметры карточки, которые показываются в таблице со списком карточек -->
     <document_fields_table>direction, num</document_fields_table>
 
+    <!-- Кастомизация типовых задач -->
+    <tasks>
+        <recall title="Перезвонить">
+            <roles_created>
+                admin
+            </roles_created>
+            <roles_edit>
+                admin
+            </roles_edit>
+            <states>
+                <wait>Ожидание</wait>
+                <work>В работе</work>
+                <closed>Закрыто</closed>
+            </states>
+            <close_states>closed</close_states>
+
+            <!-- За сколько напоминать, если нет пользовательского напоминания (в минутах) -->
+            <notify_time_before>15</notify_time_before>
+        </recall>
+    </tasks>
+
     <!--
     Параметры карточки документа.
     Эти параметры могут быть непосредственно не выводиться в форме карточки при открытии в браузере.

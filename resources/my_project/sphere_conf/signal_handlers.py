@@ -1,11 +1,38 @@
 from werkzeug.datastructures import FileStorage
 from io import BytesIO
+from flask import flash
+from datetime import timedelta
 
 from sphere import db
 from sphere.email import signals
 from sphere.bps.models import CallcenterMessage
 from sphere.bps.plugins.files.models import CallcenterMessageFile
 from sphere.auth.models import User
+from sphere.lib.utils import get_model
+from sphere.auth.utils import get_current_user
+from sphere.bps.plugins.tasks.signals import task_saved
+
+
+@task_saved.connect
+def task_saved_handler(sender, document, task, created):
+    """
+    Если в настройках задачи есть настройка напоминания "За" сколько-то минут и при этом не было 
+    выставлено напоминание при создании задачи, создаем напоминание автоматически
+    """
+    if created:
+        try:
+            notify_time_before = document.project.tasks[task.task_type].get('notify_time_before')
+            if notify_time_before and task.d_expire and not task.reminds:
+                for time_remaind in notify_time_before:
+                    TaskRemind = get_model(document.project.model_name + 'TaskRemind')
+                    remind = TaskRemind(
+                        task_id=task.id,
+                        author_id=get_current_user().id,
+                        d_remind=task.d_expire - timedelta(minutes=int(time_remaind))
+                    )
+                    db.session.add(remind)
+        except ValueError:
+            flash('Не удалось создать автоматическое напоминание.<br/>Создайте напоминание в ручную!', 'warning')
 
 
 @signals.email_loaded.connect_via('sber@sbps.ru')
