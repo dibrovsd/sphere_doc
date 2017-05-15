@@ -48,8 +48,8 @@ SECRET_KEY = '****************'
 # SMS_PROVIDER = ' '
 # SMS_SUPPRESS_SENDING = True  # Делать вид что отправили, но не отправлять (для отладки)
 
-# Настройка менеджера фоновых операций и планировщика (add link)
 
+# Настройка менеджера фоновых операций и планировщика (add link)
 CELERY_BROKER_URL = 'amqp://****:*******@localhost:5672/localhost'
 CELERY_SEND_TASK_SENT_EVENT = True
 CELERYD_CONCURRENCY = 1
@@ -57,18 +57,23 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_SEND_EVENTS = True
 CELERY_TIMEZONE = 'Europe/Moscow'
-# CELERY_IMPORTS = (
-#     'sphere.email.tasks',
-# )
+CELERY_IMPORTS = (
+    # 'sphere.email.tasks',
+    'sphere.bps.plugins.tasks.tasks',
+)
 
 # Задачи для периодического выполнения
-# CELERYBEAT_SCHEDULE = {
-#     'email_load_emails': {
-#         'task': 'sphere.email.tasks.load_emails',
-#         'schedule': crontab(hour='9-20', minute='*/10'),
-#         'kwargs': {'name': 'sber@sbps.ru'},
-#     },
-# }
+CELERYBEAT_SCHEDULE = {
+    # 'email_load_emails': {
+    #     'task': 'sphere.email.tasks.load_emails',
+    #     'schedule': crontab(hour='9-20', minute='*/10'),
+    #     'kwargs': {'name': 'sber@sbps.ru'},
+    # },
+    'task_reminder': {
+        'task': 'sphere.bps.plugins.tasks.tasks.reminder',
+        'schedule': crontab(hour='7-00', minute='*/1'),
+    },
+}
 
 # Локализация и форматирование
 LANGUAGES = {
