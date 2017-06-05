@@ -4,43 +4,39 @@ from flask import request
 from werkzeug.utils import cached_property
 
 from sphere.bps.models import Claim, CallcenterMessage
-from sphere.email.models import Log as Email
+from sphere.email.models import Log as EmailLog
 from sphere.auth.utils import get_current_user
-from sphere.lib.utils import get_model
 
 
 class EmailDataSource(object):
     """ Класс с методами, которые поставляют данные для GUI генератора писем. """
 
-    @cached_property
-    def document(self):
-        """ Текущий объект, к которому создается письмо. """
-        model = get_model(request.args.get('model_name'))
-        return model.query.get(request.args.get('object_id'))
-
-    @cached_property
-    def project(self):
-        """ Текущий проект. """
-        return self.document.project
-
     @property
-    def project_name(self):
-        """ Текущий проект. """
-        return self.project.name
+    def current_project(self):
+        """ Название текущего проекта. """
+        for project_name in ['claim', 'callcenter_message']:
+            if project_name + '_id' in request.args:
+                return project_name
+
+    @cached_property
+    def current_document(self):
+        """ Текущий объект, из которого создается письмо. """
+        model = {
+            'claim': Claim,
+            'callcenter_message': CallcenterMessage
+        }.get(self.current_project)
+
+        return model.query.get(request.args['%s_id' % self.current_project])
+
+    def get_log_data(self):
+        """ Данные для сохранения в лог письма после его отправки. """
+        return {k: int(request.args.get(k)) for k in request.args}
 
     @cached_property
     def reply_to(self):
         """ Базовое письмо, на котороые оператор пишет ответ. """
-        reply_to_id = request.args.get('reply_to')
-        if reply_to_id:
-            return Email.query.get(reply_to_id)
-
-    def get_log_data(self):
-        return None
-
-    def get_object_linked(self):
-        res = [self.document]
-        return res
+        if 'reply_to' in request.values:
+            return EmailLog.query.get(request.values['reply_to']).first()
 
     @property
     def message_types(self):

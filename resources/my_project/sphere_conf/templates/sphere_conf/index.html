@@ -5,34 +5,65 @@
 
 
 {% block content %}
-    <h1>Здравствуйте</h1>
-    <hr>
+    <div class="ibox float-e-margins m-b-sm">
+        <div class="ibox-content text-center p-xs ">
+            <h2>
+                <span class="text-navy">Добро пожаловать</span>{% if g.user.is_authenticated %}, {{current_user}} {% endif %}
+            </h2>
+            {% if not g.user.is_authenticated %}
+                Чтобы получить доступ к возможностям системы,
+                <a href="{{ url_for('auth.login') }}">представьтесь</a> пожалуйста
+            {% endif %}
+        </div>
+    </div>
 
-    <p>
-        Здравствуйте,<br/>
-        Представляем вам комплекс автоматизации процессов.<br/><br/>
+    {% if g.user.is_authenticated %}
+        <div class="tabs-container text-left m-b">
+            <ul class="nav nav-tabs">
+                {% for item in content %}
+                    <li {% if loop.first %}class="active"{% endif %}>
+                        <a data-toggle="tab" href="#tab-{{loop.index}}">
+                            {{item.title}}
+                            <span class="badge">{{item.documents_cnt}}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for item in content %}
+                    <div id="tab-{{loop.index}}" class="tab-pane {% if loop.first %}active{% endif %}">
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Документ</th>
+                                            {% for field_meta in item.fields %}
+                                                <th>{{field_meta.title}}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for document in item.documents %}
+                                        <tr>
+                                            <td nowrap><a href="{{document.url}}">{{document}}</a></td>
+                                            {% for field_meta in item.fields %}
+                                                <td nowrap>
+                                                    {{ bps_field_to_str(document, field_meta) }}
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
 
-        В него входят различные системы, но задача у них одна:<br/>
-        Упростить вашу жизнь и переложить часть работы на систему.<br/><br/>
-
-        С уважением, команда разработчиков<br/>
-        <a href="mailto:dibrovsd@gmail.com">dibrovsd@gmail.com</a>
-    </p>
-
-    <p>
-        {% if g.user.is_active %}
-            <a class="btn btn-default" href="{{ url_for('bps.index') }}">
-                <span class="glyphicon glyphicon-th-list"></span> Документы</a>
-
-                <a class="btn btn-default" href="{{ url_for('admin.index') }}">
-                    <span class="glyphicon glyphicon-cog"></span> Админка</a>
-        {% else %}
-            <div class="alert alert-info alert-sm">
-                Чтобы получить доступ к возможностям системы
-                <a class="btn btn-success btn-xs" href="{{ url_for('auth.login') }}">представьтесь</a>
-                пожалуйста
             </div>
-        {% endif %}
-    </p>
+        </div>
+
+    {% endif %}
 
 {% endblock %}

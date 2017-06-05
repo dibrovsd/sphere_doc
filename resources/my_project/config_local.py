@@ -7,20 +7,18 @@
 
 from config import EMAIL_DOWNLOAD, LOGGING_SERVER
 
-# DEBUG = True  # Режим отладки
-
 # Храним кэш в оперативной памяти
 CACHE_TYPE = 'simple'
 
-SECRET_KEY = '***_secret_***'
-SQLALCHEMY_DATABASE_URI = 'postgresql://sphere_user:***_secret_***@localhost/sber'
+SECRET_KEY = '***_replace_me_***'
+SQLALCHEMY_DATABASE_URI = 'postgresql://sphere_user:******@localhost/my_project'
 MAIL_PASSWORD = '***_secret_***'
-EMAIL_DOWNLOAD['sber@sbps.ru']['password'] = '***_secret_***'
-SMS_PASSWORD = '***_secret_***'
+EMAIL_DOWNLOAD['price_from_supplier']['password'] = '***_replace_me_***'
+SMS_PASSWORD = '***_replace_me_***'
 
 # Брокером для асинхронных сообщений используем sqlite в корне
-CELERY_BROKER_URL = 'sqla+sqlite:///celerydb.sqlite'
+CELERY_BROKER_URL = 'amqp://sphere_user:*********@localhost:5672/localhost_my_project'
 
 # Логи шлем как dev
 LOGGING_SERVER['project_name'] = 'sphere_dev'
-LOGGING_SERVER['api_key'] = '***_secret_***'
+LOGGING_SERVER['api_key'] = '***_replace_me_***'

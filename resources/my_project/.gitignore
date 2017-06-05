@@ -1,0 +1,12 @@
+*~
+.DS_Store
+*.pyc
+__pycache__
+media
+media/
+config_local.py
+touch_reload
+sphere/
+sphere
+celerybeat-schedule.db
+celerydb.sqlite

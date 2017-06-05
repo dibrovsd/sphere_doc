@@ -22,57 +22,73 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # Ключ для просаливания всех хэшей
 SECRET_KEY = '****************'
 
-# # Настройка отправки почты
-# MAIL_USERNAME = ' '
-# MAIL_PASSWORD = ' '
-# MAIL_HOST = ' '
-# MAIL_PORT =
-# MAIL_SUPPRESS_SENDING = False  # Делать вид что отправили, но не отправлять (для отладки)
+# Настройка отправки почты
+MAIL_USERNAME = 'robot@sbps.ru'  # Логин
+MAIL_PASSWORD = '********'
+MAIL_HOST = 'smtp.mail.ru'
+MAIL_PORT = 465
+MAIL_SSL = True  # Использовать соединение SSL (По умолчанию "True")
+MAIL_TLS = False  # Использовать соединение TLS (По умолчанию "False")
+MAIL_SUPPRESS_SENDING = False  # Нужно ли подавить фактическую отправку почты (используется для отладки)
 
-# Настройка скачивания почты
-#
-# EMAIL_DOWNLOAD = {
-#     'mail@mail.ru': {
-#         'host': ' ',
-#         'port': ,
-#         'login': ' ',
-#         'password': ' ',
-#         'folders': ['inbox'],
-#     },
-# }
+# Настройка скачивания почты (задание расписания смотрите в секции Celery - там есть пример под эту ситуацию)
+EMAIL_DOWNLOAD = {
+    'price_from_supplier': {
+        'host': 'imap.mail.ru',
+        'port': 993,
+        'ssl': True,
+        'tls': False,
+        'load_email': 'price.vetro18@sbps.ru',  # Адрес почты может отличаться от логина
+        'login': 'price.vetro18@sbps.ru',
+        'password': '******',
+        'folders': ['inbox'],  # Из каких папок выкачиваем почту
+    }
+}
 
 # Отправка SMS-сообщений
-# SMS_LOGIN = ' '
-# SMS_PASSWORD = ' '
-# SMS_SENDER = ' '
-# SMS_PROVIDER = ' '
-# SMS_SUPPRESS_SENDING = True  # Делать вид что отправили, но не отправлять (для отладки)
-
+SMS_LOGIN = '********'
+SMS_PASSWORD = '********'
+SMS_SENDER = '********'
+SMS_PROVIDER = 'prostor'
+SMS_SUPPRESS_SENDING = True  # Не отправлять сообщения на самом деле (для отладки)
 
 # Настройка менеджера фоновых операций и планировщика (add link)
-CELERY_BROKER_URL = 'amqp://****:*******@localhost:5672/localhost'
-CELERY_SEND_TASK_SENT_EVENT = True
-CELERYD_CONCURRENCY = 1
-CELERYD_HIJACK_ROOT_LOGGER = False
-CELERY_ACCEPT_CONTENT = ['pickle']
+
+CELERY_BROKER_URL = 'amqp://sphere_user:*****@localhost:5672/localhost_stoa'  # Через что передаются задания фоновым процессам
+CELERY_SEND_TASK_SENT_EVENT = True  # Чтобы можно было смотреть, что делает там celery сейчас
 CELERY_SEND_EVENTS = True
-CELERY_TIMEZONE = 'Europe/Moscow'
+CELERYD_CONCURRENCY = 1  # Кол-во одновременных обработчиков
+CELERYD_HIJACK_ROOT_LOGGER = False  # Логи мы будем обрабатывать сами, поэтому выключим перехват логов самой celery
+CELERY_ACCEPT_CONTENT = ['pickle']  # При передаче в фон, как будем запаковывать аргументы вызова
+CELERY_TIMEZONE = 'Europe/Moscow'  # При запуске по расписанию, будем использовать время Москвы
+
+# Настройки расписаний задач, которые выполняются
+# Тут нужно перечислить все модули, где лежат задачи к celery
+# Иначе они не будут видны планировщику, который сначала загружает все, а только потом работает с этим
 CELERY_IMPORTS = (
-    # 'sphere.email.tasks',
-    'sphere.bps.plugins.tasks.tasks',
+    'sphere.email.tasks',
+    # 'sphere_conf.bps.projects.service.tasks',
+    # 'sphere.bps.plugins.tasks.tasks'
 )
 
-# Задачи для периодического выполнения
 CELERYBEAT_SCHEDULE = {
-    # 'email_load_emails': {
-    #     'task': 'sphere.email.tasks.load_emails',
-    #     'schedule': crontab(hour='9-20', minute='*/10'),
-    #     'kwargs': {'name': 'sber@sbps.ru'},
+    # 'base_recall_notify': {
+    #     'task': 'base.tasks.recall_notify',
+    #     'schedule': crontab(hour='9-22', minute='*/30'),  # с 9 до 22 каждые 30 минут
     # },
-    'task_reminder': {
-        'task': 'sphere.bps.plugins.tasks.tasks.reminder',
-        'schedule': crontab(hour='7-00', minute='*/1'),
-    },
+    # 'api_update_stoa_master': {
+    #     'task': 'api.tasks.update_stoa_master',
+    #     'schedule': crontab(hour=7, minute=0),  # В 7 часов утра
+    # },
+    # 'api_update_autotrade_catalog': {
+    #     'task': 'api.tasks.update_autotrade_catalog',
+    #     'schedule': crontab(day_of_week=6, hour=2, minute=0),  # В 2 часов утра в субботу
+    # },
+    # 'email_load_price_from_supplier': {
+    #     'task': 'sphere.email.tasks.load_emails',
+    #     'schedule': crontab(hour='9-22', minute='*/30'),
+    #     'kwargs': {'load_profile': 'price_from_supplier'},  # При запуске передать в метод аргументы
+    # },
 }
 
 # Локализация и форматирование
@@ -131,15 +147,16 @@ LOGGING = [
     }
 ]
 
-# Настройка системы обработки логов
-# LOGGING_SERVER = {
-#     'project_name': 'sphere_*',
-#     'url': 'https://logs.myserver.ru/',
-#     'api_key': '*****'
-# }
+# Все логи отправляем в центральное хранилище, где они будут обработаны по своей логике
+LOGGING_SERVER = {
+    'project_name': 'sphere_*',
+    'url': 'https://logs.myserver.ru/',
+    'api_key': '*****'
+}
 
-# Переходы по этим адресам не логгировать, чтоб не генерировать мусор
-LOG_SUPPRESS_ENDPOINT = []
+# При запросе этих ресурсов, логи посещения не храним, чтобы не перегружать хранение истории посещения оператора
+# не интересных нам адресов, которые мы не хотим фиксировать
+LOG_SUPPRESS_ENDPOINT = ['lib.user_notification_new']
 
 # Версия файлов статики, чтобы обновлять стили и скрипты при ее изменении
 # Ее изменение генерирует другие ссылки к файлам статики и заставляет браузер не использовать кэш

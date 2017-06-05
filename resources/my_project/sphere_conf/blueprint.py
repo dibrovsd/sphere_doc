@@ -1,6 +1,6 @@
 
 from flask import Blueprint
-from base import views
+from sphere_conf import views
 
 blueprint = Blueprint('sphere_conf', __name__, template_folder='templates')
 
