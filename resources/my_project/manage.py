@@ -6,8 +6,9 @@
 """
 
 from flask_script import Manager
-from sphere import server
+from sphere import server, db, cache
 from sphere.lib.managment_commands import create_superuser as create_superuser_
+from sphere.lib.syncdb import SyncManager
 from sphere.reports.commands import update_label_map
 from flask_migrate import MigrateCommand
 
@@ -30,6 +31,19 @@ def runserver(host='127.0.0.1', port='5000', debug='True'):
 def create_superuser(email, password):
     """ Создать пользователя с правами админа. """
     create_superuser_(email, password)
+
+
+@manager.command
+def syncdb():
+    """ Выполнить модификацию базы данных, взяв модели за основу """
+    manager = SyncManager(engine=db.engine)
+    manager.process()
+
+
+@manager.command
+def cache_clear():
+    """ Полный сброс кэша """
+    cache.clear()
 
 
 @manager.command
