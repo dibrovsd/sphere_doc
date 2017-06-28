@@ -10,15 +10,15 @@
    :maxdepth: 1
 
    blueprint
+   views
+   views_doc
+   models
    forms
    meta
    mixin_models
    mixin_views
-   models
    signal_handlers
    signals
    table_field_access
    tasks
    utils
-   views_doc
-   views

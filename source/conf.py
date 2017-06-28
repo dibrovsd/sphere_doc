@@ -19,6 +19,7 @@
 #
 # import os
 import sys
+
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, '/Volumes/projects/sber/')
 sys.path.insert(1, '/Volumes/workspace/sber/')
@@ -227,7 +228,7 @@ html_show_sourcelink = False
 #   'da', 'de', 'en', 'es', 'fi', 'fr', 'h', 'it', 'ja'
 #   'nl', 'no', 'pt', 'ro', 'r', 'sv', 'tr', 'zh'
 #
-# html_search_language = 'en'
+html_search_language = 'ru'
 
 # A dictionary with options for the search language support, empty by default.
 # 'ja' uses this config value.

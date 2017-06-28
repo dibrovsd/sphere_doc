@@ -9,9 +9,9 @@
 .. toctree::
    :maxdepth: 1
 
-   admin
    blueprint
-   forms
-   models
-   utils
    views
+   models
+   admin
+   forms
+   utils

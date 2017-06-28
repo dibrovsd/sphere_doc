@@ -6,21 +6,10 @@
 Модуль:
     sphere.auth.blueprint
 
-* Путь `/login/` вызывает `LoginView`
-
-  Системное имя _login_
-* Путь `/logout/` вызывает `LogoutView`
-
-  Системное имя _logout_
-* Путь `/password_change/` вызывает `PasswordChangeView`
-
-  Системное имя _password_change_
-* Путь `/reset_password/` вызывает `PasswordResetView`
-
-  Системное имя _reset_password_
-* Путь `/reset_password/complete/<token>/` вызывает `LoginResetCompleteView`
-
-  Системное имя _reset_password_complete_
-* Путь `/login_as_user/<email>/` вызывает `LoginInUserView`
-
-  Системное имя _login_as_user_
+* _login_ : `/login/` вызывает `LoginView`. 
+* _logout_ : `/logout/` вызывает `LogoutView`. 
+* _password_change_ : `/password_change/` вызывает `PasswordChangeView`. 
+* _reset_password_ : `/reset_password/` вызывает `PasswordResetView`. 
+* _reset_password_complete_ : `/reset_password/complete/<token>/` вызывает `LoginResetCompleteView`. 
+* _login_as_user_ : `/login_as_user/<email>/` вызывает `LoginInUserView`. 
+* _set_settings_ajax_ : `/set_settings_ajax/` вызывает `SetSettingsAjax`. 
